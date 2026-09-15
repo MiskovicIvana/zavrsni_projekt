@@ -131,8 +131,10 @@ class GraphEditor:
         self.selected_node = None
 
         n = len(capacity)
-        self.node_counter = n
-
+        for i in range(n):
+            self.G.add_node(i)
+            self.node_labels[i] = names.get(i, str(i))
+            self.node_counter = (max(self.G.nodes) + 2) if (n > 0 and 0 in self.G.nodes) else (max(self.G.nodes) + 1 if n > 0 else 1)
         for i in range(n):
             self.G.add_node(i)
             self.node_labels[i] = names.get(i, str(i))
@@ -254,8 +256,15 @@ class GraphEditor:
 
         if event.button == 1:
             if clicked_node is None:
-                node_id = self.node_counter
-                self.node_counter += 1
+                if len(self.G.nodes) > 0:
+                    max_node = max(self.G.nodes)
+                    if 0 in self.G.nodes and max_node < len(self.G.nodes):
+                        node_id = max_node + 2
+                    else:
+                        node_id = max_node + 1
+                else:
+                    node_id = 1
+                self.node_counter = node_id + 1
                 self.G.add_node(node_id)
                 node_name = str(node_id)
                 self.node_labels[node_id] = node_name
@@ -370,7 +379,7 @@ class GraphEditor:
                 self.pos.clear()
                 self.node_labels.clear()
                 self.selected_node = None
-                self.node_counter = 0
+                self.node_counter = 1
                 self.undo_stack.clear()
                 self.info_text.set_text("Graf je obrisan. Kliknite za dodavanje novog čvora.")
                 self.draw_editor()
